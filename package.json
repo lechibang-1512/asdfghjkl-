@@ -1,0 +1,36 @@
+{
+  "name": "asdfghjkl-",
+  "version": "4.5.0",
+  "description": "Realistic password strength estimator",
+  "author": "banglc-1512",
+  "license": "MIT",
+  "main": "lib/main.js",
+  "repository": "lechibang-1512/asdfghjkl-",
+  "scripts": {
+    "build": "esbuild src/main.coffee --bundle --sourcemap --outfile=dist/zxcvbn.js --platform=browser",
+    "build-lib": "coffee -o lib --compile --bare --map src/*.coffee",
+    "test": "tape test/*.coffee | faucet",
+    "prepublish": "npm run build-lib && npm run build"
+  },
+  "devDependencies": {
+    "coffeescript": "^2.7.0",
+    "esbuild": "^0.25.6",
+    "faucet": "^0.0.4",
+    "tape": "^5.9.0"
+  },
+  "keywords": [
+    "password",
+    "passphrase",
+    "security",
+    "authentication",
+    "strength",
+    "meter",
+    "quality",
+    "estimation",
+    "pattern",
+    "cracking",
+    "scoring",
+    "entropy",
+    "bruteforce"
+  ]
+}
