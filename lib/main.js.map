@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "main.js",
+  "sourceRoot": "../",
+  "sources": [
+    "src/main.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA,IAAA,QAAA,EAAA,QAAA,EAAA,OAAA,EAAA,IAAA,EAAA,cAAA,EAAA;;AAAA,QAAA,GAAW,OAAA,CAAQ,YAAR;;AACX,OAAA,GAAU,OAAA,CAAQ,WAAR;;AACV,cAAA,GAAiB,OAAA,CAAQ,kBAAR;;AACjB,QAAA,GAAW,OAAA,CAAQ,YAAR;;AAEX,IAAA,GAAO,QAAA,CAAA,CAAA;SAAG,CAAC,IAAI,IAAJ,CAAA,CAAD,CAAY,CAAC,OAAb,CAAA;AAAH;;AAEP,MAAA,GAAS,QAAA,CAAC,QAAD,EAAW,cAAc,EAAzB,CAAA;AACT,MAAA,GAAA,EAAA,YAAA,EAAA,CAAA,EAAA,GAAA,EAAA,OAAA,EAAA,IAAA,EAAA,GAAA,EAAA,MAAA,EAAA,gBAAA,EAAA,KAAA,EAAA;EAAE,KAAA,GAAQ,IAAA,CAAA,EAAV;;EAEE,gBAAA,GAAmB;EACnB,KAAA,6CAAA;;IACE,WAAG,OAAO,SAAQ,YAAf,QAAyB,YAAzB,QAAmC,SAAtC;MACE,gBAAgB,CAAC,IAAjB,CAAsB,GAAG,CAAC,QAAJ,CAAA,CAAc,CAAC,WAAf,CAAA,CAAtB,EADF;;EADF;EAGA,QAAQ,CAAC,yBAAT,CAAmC,gBAAnC;EACA,OAAA,GAAU,QAAQ,CAAC,SAAT,CAAmB,QAAnB;EACV,MAAA,GAAS,OAAO,CAAC,6BAAR,CAAsC,QAAtC,EAAgD,OAAhD;EACT,MAAM,CAAC,SAAP,GAAmB,IAAA,CAAA,CAAA,GAAS;EAC5B,YAAA,GAAe,cAAc,CAAC,qBAAf,CAAqC,MAAM,CAAC,OAA5C;EACf,KAAA,oBAAA;;IACE,MAAM,CAAC,IAAD,CAAN,GAAe;EADjB;EAEA,MAAM,CAAC,QAAP,GAAkB,QAAQ,CAAC,YAAT,CAAsB,MAAM,CAAC,KAA7B,EAAoC,MAAM,CAAC,QAA3C;SAClB;AAfO;;AAiBT,MAAM,CAAC,OAAP,GAAiB",
+  "sourcesContent": [
+    "matching = require './matching'\nscoring = require './scoring'\ntime_estimates = require './time_estimates'\nfeedback = require './feedback'\n\ntime = -> (new Date()).getTime()\n\nzxcvbn = (password, user_inputs = []) ->\n  start = time()\n  # reset the user inputs matcher on a per-request basis to keep things stateless\n  sanitized_inputs = []\n  for arg in user_inputs\n    if typeof arg in [\"string\", \"number\", \"boolean\"]\n      sanitized_inputs.push arg.toString().toLowerCase()\n  matching.set_user_input_dictionary sanitized_inputs\n  matches = matching.omnimatch password\n  result = scoring.most_guessable_match_sequence password, matches\n  result.calc_time = time() - start\n  attack_times = time_estimates.estimate_attack_times result.guesses\n  for prop, val of attack_times\n    result[prop] = val\n  result.feedback = feedback.get_feedback result.score, result.sequence\n  result\n\nmodule.exports = zxcvbn\n"
+  ]
+}

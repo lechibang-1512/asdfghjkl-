@@ -4,10 +4,10 @@
   "description": "Realistic password strength estimator",
   "author": "banglc-1512",
   "license": "MIT",
-  "main": "lib/main.js",
+  "main": "lib/main.cjs",
   "repository": "lechibang-1512/asdfghjkl-",
   "scripts": {
-    "build": "esbuild src/main.coffee --bundle --sourcemap --outfile=dist/zxcvbn.js --platform=browser",
+    "build": "esbuild lib/main.cjs --bundle --sourcemap --outfile=dist/asdfghjkl-.js --platform=browser",
     "build-lib": "coffee -o lib --compile --bare --map src/*.coffee",
     "test": "tape test/*.coffee | faucet",
     "prepublish": "npm run build-lib && npm run build"
