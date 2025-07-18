@@ -92,6 +92,7 @@ var requirejs, require, define;
     function eachProp(obj, func) {
         var prop;
         for (prop in obj) {
+            if (prop === "__proto__" || prop === "constructor") continue;
             if (hasProp(obj, prop)) {
                 if (func(obj[prop], prop)) {
                     break;
@@ -107,6 +108,7 @@ var requirejs, require, define;
     function mixin(target, source, force, deepStringMixin) {
         if (source) {
             eachProp(source, function (value, prop) {
+                if (prop === "__proto__" || prop === "constructor") return;
                 if (force || !hasProp(target, prop)) {
                     if (deepStringMixin && typeof value === 'object' && value &&
                         !isArray(value) && !isFunction(value) &&

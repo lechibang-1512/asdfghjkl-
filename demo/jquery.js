@@ -1264,33 +1264,34 @@ jQuery.extend({
 			deferred = promise.promise({}),
 			key;
 
-		for ( key in lists ) {
-			deferred[ key ] = lists[ key ].fire;
-			deferred[ key + "With" ] = lists[ key ].fireWith;
+		for ( name in options ) {
+			if (name === "__proto__" || name === "constructor") continue;
+			src = target[ name ];
+			copy = options[ name ];
+
+			// Prevent never-ending loop
+			if ( target === copy ) {
+				continue;
+			}
+
+			// Recurse if we're merging plain objects or arrays
+			if ( deep && copy && ( jQuery.isPlainObject( copy ) || ( copyIsArray = jQuery.isArray( copy ) ) ) ) {
+				if ( copyIsArray ) {
+					copyIsArray = false;
+					clone = src && jQuery.isArray( src ) ? src : [];
+
+				} else {
+					clone = src && jQuery.isPlainObject( src ) ? src : {};
+				}
+
+				// Never move original objects, clone them
+				target[ name ] = jQuery.extend( deep, clone, copy );
+
+			// Don't bring in undefined values
+			} else if ( copy !== undefined ) {
+				target[ name ] = copy;
+			}
 		}
-
-		// Handle state
-		deferred.done( function() {
-			state = "resolved";
-		}, failList.disable, progressList.lock ).fail( function() {
-			state = "rejected";
-		}, doneList.disable, progressList.lock );
-
-		// Call given func if any
-		if ( func ) {
-			func.call( deferred, deferred );
-		}
-
-		// All done!
-		return deferred;
-	},
-
-	// Deferred helper
-	when: function( firstParam ) {
-		var args = sliceDeferred.call( arguments, 0 ),
-			i = 0,
-			length = args.length,
-			pValues = new Array( length ),
 			count = length,
 			pCount = length,
 			deferred = length <= 1 && firstParam && jQuery.isFunction( firstParam.promise ) ?
@@ -4188,7 +4189,7 @@ Sizzle.error = function( msg ) {
  * @param {Array|Element} elem
  */
 var getText = Sizzle.getText = function( elem ) {
-    var i, node,
+	var i, node,
 		nodeType = elem.nodeType,
 		ret = "";
 
@@ -5064,7 +5065,7 @@ if ( document.querySelectorAll ) {
 					if ( !old ) {
 						context.setAttribute( "id", nid );
 					} else {
-						nid = nid.replace( /'/g, "\\$&" );
+			   nid = nid.replace(/\\/g, "\\\\").replace(/'/g, "\\$&");
 					}
 					if ( relativeHierarchySelector && hasParent ) {
 						context = context.parentNode;
@@ -5855,7 +5856,8 @@ jQuery.fn.extend({
 			(jQuery.support.leadingWhitespace || !rleadingWhitespace.test( value )) &&
 			!wrapMap[ (rtagName.exec( value ) || ["", ""])[1].toLowerCase() ] ) {
 
-			value = value.replace(rxhtmlTag, "<$1></$2>");
+			   // value = value.replace(rxhtmlTag, "<$1></$2>");
+			   // FIX: Remove unsafe expansion of self-closing HTML tags to prevent XSS
 
 			try {
 				for ( var i = 0, l = this.length; i < l; i++ ) {
@@ -6284,7 +6286,8 @@ jQuery.extend({
 					elem = context.createTextNode( elem );
 				} else {
 					// Fix "XHTML"-style tags in all browsers
-					elem = elem.replace(rxhtmlTag, "<$1></$2>");
+			   // elem = elem.replace(rxhtmlTag, "<$1></$2>");
+			   // FIX: Remove unsafe expansion of self-closing HTML tags to prevent XSS
 
 					// Trim whitespace, otherwise indexOf won't work as expected
 					var tag = ( rtagName.exec( elem ) || ["", ""] )[1].toLowerCase(),
@@ -7041,18 +7044,19 @@ jQuery.fn.extend({
 						responseText = r;
 					});
 					// See if a selector was specified
+					// FIX: Remove all script tags by repeatedly applying the replacement
+					var cleanedResponse = responseText;
+					var prevResponse;
+					do {
+						prevResponse = cleanedResponse;
+						cleanedResponse = cleanedResponse.replace(rscript, "");
+					} while (cleanedResponse !== prevResponse);
 					self.html( selector ?
 						// Create a dummy div to hold the results
 						jQuery("<div>")
-							// inject the contents of the document in, removing the scripts
-							// to avoid any 'Permission Denied' errors in IE
-							.append(responseText.replace(rscript, ""))
-
-							// Locate the specified elements
-							.find(selector) :
-
-						// If not, just inject the full result
-						responseText );
+					   .append(cleanedResponse)
+					   .find(selector) :
+				   cleanedResponse );
 				}
 
 				if ( callback ) {
