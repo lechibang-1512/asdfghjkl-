@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "coffeescript": "^2.7.0",
-    "esbuild": "^0.25.6",
+    "esbuild": "^0.25.8",
     "faucet": "^0.0.4",
     "tape": "^5.9.0"
   },
